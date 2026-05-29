@@ -2,11 +2,12 @@ package main
 
 import (
 	"os"
-	"binpathutil/cmd/binpath/cmd"
-) 
+
+	"binpathutil/cmd/binpath/subcmd"
+)
 
 func main() {
-	if err := cmd.Execute(); err != nil {
+	if err := subcmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 }
