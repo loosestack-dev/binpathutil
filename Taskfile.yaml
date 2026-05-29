@@ -1,0 +1,28 @@
+version: "3"
+
+tasks:
+  list:
+    desc: "Show all available tasks"
+    cmds:
+      - task --list-all
+
+  default:
+    silent: true
+    desc: "Fuzzy search on task to search and launch one"
+    cmds:
+      - |
+        selected=$(task --list 2>/dev/null \
+          | grep '^\*' \
+          | sed 's/^\* //' \
+          | fzf --prompt="⚡ task> " --height=50% --reverse --border=rounded)
+        if [ -n "$selected" ]; then
+          task_name=$(echo "$selected" | awk '{print $1}' | sed 's/:$//')
+          echo "▶ Running: task $task_name"
+          task "$task_name"
+        fi
+
+  build:
+    desc: "Build all cli for the current plateform"
+    cmds:
+      - go mod tidy
+      - go build -o binpath ./cmd/binpath
