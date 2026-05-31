@@ -6,7 +6,7 @@ import (
 	"binpathutil/internal/path/domain"
 )
 
-func append(element string, ignoreIfPresent bool, getPathDependency func() (string, error)) (string, error) {
+func appendElement(element string, ignoreIfPresent bool, getPathDependency func() (string, error)) (string, error) {
 	rawEnvValue, err := getPathDependency()
 	if err != nil {
 		return "", fmt.Errorf("unable to retrieve PATH env variable: %w", err)
@@ -23,9 +23,9 @@ func append(element string, ignoreIfPresent bool, getPathDependency func() (stri
 }
 
 func Append(element string, getPathDependency func() (string, error)) (string, error) {
-	return append(element, false, getPathDependency)
+	return appendElement(element, false, getPathDependency)
 }
 
 func AppendIfAbsent(element string, getPathDependency func() (string, error)) (string, error) {
-	return append(element, true, getPathDependency)
+	return appendElement(element, true, getPathDependency)
 }

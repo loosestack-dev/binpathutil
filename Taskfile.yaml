@@ -31,3 +31,8 @@ tasks:
     desc: "Run all tests"
     cmds:
       - go test ./...
+
+  test:count:
+    desc: "Run all tests and report how many tests/subtests passed"
+    cmds:
+      - go test ./... -v | grep -c -- "--- PASS:"
