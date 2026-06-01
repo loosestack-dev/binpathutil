@@ -114,3 +114,137 @@ func TestRemoveAllOccurence_dependencyError(t *testing.T) {
 		t.Fatalf("RemoveAllOccurence: expected error when dependency fails, got nil (result %q)", got)
 	}
 }
+
+func TestRemoveRegex(t *testing.T) {
+	sep := string(os.PathListSeparator)
+	base := strings.Join([]string{"/usr/bin", "/bin", "/usr/local/bin"}, sep)
+
+	tests := []struct {
+		name    string
+		pattern string
+		path    string
+		want    string
+		wantErr bool
+	}{
+		{"removes first match", "usr", base, strings.Join([]string{"/bin", "/usr/local/bin"}, sep), false},
+		{"anchored match", "^/bin$", base, strings.Join([]string{"/usr/bin", "/usr/local/bin"}, sep), false},
+		{"no match errors (strict)", "^/opt", base, "", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := usecases.RemoveRegex(tt.pattern, stubErr(tt.path, nil))
+			if tt.wantErr {
+				if err == nil {
+					t.Fatalf("RemoveRegex(%q): expected error, got nil (result %q)", tt.pattern, got)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("RemoveRegex(%q) unexpected error: %v", tt.pattern, err)
+			}
+			if got != tt.want {
+				t.Errorf("RemoveRegex(%q) = %q, want %q", tt.pattern, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestRemoveRegex_invalidRegex(t *testing.T) {
+	sep := string(os.PathListSeparator)
+	base := strings.Join([]string{"/usr/bin", "/bin"}, sep)
+
+	got, err := usecases.RemoveRegex("[", stubErr(base, nil))
+	if err == nil {
+		t.Fatalf("RemoveRegex: expected error for malformed pattern, got nil (result %q)", got)
+	}
+}
+
+func TestRemoveRegex_dependencyError(t *testing.T) {
+	got, err := usecases.RemoveRegex("usr", stubErr("", errors.New("PATH unavailable")))
+	if err == nil {
+		t.Fatalf("RemoveRegex: expected error when dependency fails, got nil (result %q)", got)
+	}
+}
+
+func TestRemoveIfPresentRegex(t *testing.T) {
+	sep := string(os.PathListSeparator)
+	base := strings.Join([]string{"/usr/bin", "/bin", "/usr/local/bin"}, sep)
+
+	tests := []struct {
+		name    string
+		pattern string
+		path    string
+		want    string
+	}{
+		{"removes first match", "usr", base, strings.Join([]string{"/bin", "/usr/local/bin"}, sep)},
+		{"no match is no-op", "^/opt", base, base},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := usecases.RemoveIfPresentRegex(tt.pattern, stubErr(tt.path, nil))
+			if err != nil {
+				t.Fatalf("RemoveIfPresentRegex(%q) unexpected error: %v", tt.pattern, err)
+			}
+			if got != tt.want {
+				t.Errorf("RemoveIfPresentRegex(%q) = %q, want %q", tt.pattern, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestRemoveIfPresentRegex_invalidRegex(t *testing.T) {
+	sep := string(os.PathListSeparator)
+	base := strings.Join([]string{"/usr/bin", "/bin"}, sep)
+
+	if _, err := usecases.RemoveIfPresentRegex("[", stubErr(base, nil)); err == nil {
+		t.Fatal("RemoveIfPresentRegex: expected error for malformed pattern, got nil")
+	}
+}
+
+func TestRemoveIfPresentRegex_dependencyError(t *testing.T) {
+	if _, err := usecases.RemoveIfPresentRegex("usr", stubErr("", errors.New("PATH unavailable"))); err == nil {
+		t.Fatal("RemoveIfPresentRegex: expected error when dependency fails, got nil")
+	}
+}
+
+func TestRemoveAllOccurenceRegex(t *testing.T) {
+	sep := string(os.PathListSeparator)
+	base := strings.Join([]string{"/usr/bin", "/bin", "/usr/local/bin"}, sep)
+
+	tests := []struct {
+		name    string
+		pattern string
+		path    string
+		want    string
+	}{
+		{"removes all matches", "usr", base, "/bin"},
+		{"removes single match", "^/bin$", base, strings.Join([]string{"/usr/bin", "/usr/local/bin"}, sep)},
+		{"no match is no-op", "^/opt", base, base},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := usecases.RemoveAllOccurenceRegex(tt.pattern, stubErr(tt.path, nil))
+			if err != nil {
+				t.Fatalf("RemoveAllOccurenceRegex(%q) unexpected error: %v", tt.pattern, err)
+			}
+			if got != tt.want {
+				t.Errorf("RemoveAllOccurenceRegex(%q) = %q, want %q", tt.pattern, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestRemoveAllOccurenceRegex_invalidRegex(t *testing.T) {
+	sep := string(os.PathListSeparator)
+	base := strings.Join([]string{"/usr/bin", "/bin"}, sep)
+
+	if _, err := usecases.RemoveAllOccurenceRegex("[", stubErr(base, nil)); err == nil {
+		t.Fatal("RemoveAllOccurenceRegex: expected error for malformed pattern, got nil")
+	}
+}
+
+func TestRemoveAllOccurenceRegex_dependencyError(t *testing.T) {
+	if _, err := usecases.RemoveAllOccurenceRegex("usr", stubErr("", errors.New("PATH unavailable"))); err == nil {
+		t.Fatal("RemoveAllOccurenceRegex: expected error when dependency fails, got nil")
+	}
+}

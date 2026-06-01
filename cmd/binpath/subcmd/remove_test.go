@@ -55,3 +55,38 @@ func TestRemoveCmd_requiresExactlyOneArg(t *testing.T) {
 		t.Fatal("remove with no args: expected error, got nil")
 	}
 }
+
+func TestRemoveCmd_regex(t *testing.T) {
+	base := strings.Join([]string{"/usr/bin", "/bin", "/usr/local/bin"}, pathSep)
+
+	tests := []struct {
+		name    string
+		args    []string
+		want    string // expected stdout (when no error)
+		wantErr bool   // true => genuine error (strict no-match, bad pattern)
+	}{
+		{"-r removes first match", []string{"-r", "usr"}, strings.Join([]string{"/bin", "/usr/local/bin"}, pathSep), false},
+		{"-r -a removes all matches", []string{"-r", "-a", "usr"}, "/bin", false},
+		{"-r -i no-match is no-op", []string{"-r", "-i", "^/opt"}, base, false},
+		{"-r no-match errors (strict)", []string{"-r", "^/opt"}, "", true},
+		{"-r malformed pattern errors", []string{"-r", "["}, "", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Setenv("PATH", base)
+			got, err := execCmd(t, newRemoveCmd(), tt.args...)
+			if tt.wantErr {
+				if err == nil {
+					t.Fatalf("remove %v: expected error, got nil (output %q)", tt.args, got)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("remove %v: unexpected error: %v", tt.args, err)
+			}
+			if got != tt.want {
+				t.Errorf("remove %v = %q, want %q", tt.args, got, tt.want)
+			}
+		})
+	}
+}

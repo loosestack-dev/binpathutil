@@ -38,6 +38,16 @@ func (p *EnvPath) Remove(entry string) error {
 	return nil
 }
 
+// RemoveMatch removes the first entry matching the expression; errors if none match.
+func (p *EnvPath) RemoveMatch(re *regexp.Regexp) error {
+	i := slices.IndexFunc(p.Entries, re.MatchString)
+	if i == -1 {
+		return fmt.Errorf("no entry matching %q found in PATH", re.String())
+	}
+	p.Entries = slices.Delete(p.Entries, i, i+1)
+	return nil
+}
+
 func (p *EnvPath) Prepend(entry string) {
 	p.Entries = slices.Insert(p.Entries, 0, entry)
 }

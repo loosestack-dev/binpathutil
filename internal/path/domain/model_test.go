@@ -145,6 +145,34 @@ func TestEnvPath_Remove(t *testing.T) {
 	}
 }
 
+func TestEnvPath_RemoveMatch(t *testing.T) {
+	base := strings.Join([]string{"/usr/bin", "/bin", "/usr/local/bin"}, sep())
+
+	tests := []struct {
+		name    string
+		raw     string
+		pattern string
+		want    []string
+		wantErr bool
+	}{
+		{"removes first match", base, "usr", []string{"/bin", "/usr/local/bin"}, false},
+		{"anchored single match", base, "^/bin$", []string{"/usr/bin", "/usr/local/bin"}, false},
+		{"no match errors", base, "^/opt", []string{"/usr/bin", "/bin", "/usr/local/bin"}, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := domain.NewEnvPath(tt.raw)
+			err := p.RemoveMatch(regexp.MustCompile(tt.pattern))
+			if (err != nil) != tt.wantErr {
+				t.Errorf("RemoveMatch(%q) error = %v, wantErr %v", tt.pattern, err, tt.wantErr)
+			}
+			if !slices.Equal(p.Entries, tt.want) {
+				t.Errorf("after RemoveMatch(%q), Entries = %v, want %v", tt.pattern, p.Entries, tt.want)
+			}
+		})
+	}
+}
+
 func TestEnvPath_String(t *testing.T) {
 	tests := []struct {
 		name string
