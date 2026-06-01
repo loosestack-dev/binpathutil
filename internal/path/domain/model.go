@@ -3,6 +3,7 @@ package domain
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"slices"
 	"strings"
 )
@@ -22,6 +23,10 @@ func NewEnvPath(rawPath string) *EnvPath {
 
 func (p *EnvPath) Contains(entry string) bool {
 	return slices.Contains(p.Entries, entry)
+}
+
+func (p *EnvPath) ContainsMatch(re *regexp.Regexp) bool {
+	return slices.ContainsFunc(p.Entries, re.MatchString)
 }
 
 func (p *EnvPath) Remove(entry string) error {

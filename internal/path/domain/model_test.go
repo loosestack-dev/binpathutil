@@ -2,6 +2,7 @@ package domain_test
 
 import (
 	"os"
+	"regexp"
 	"slices"
 	"strings"
 	"testing"
@@ -46,6 +47,30 @@ func TestEnvPath_Contains(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := domain.NewEnvPath(tt.raw).Contains(tt.entry); got != tt.want {
 				t.Errorf("Contains(%q) = %v, want %v", tt.entry, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestEnvPath_ContainsMatch(t *testing.T) {
+	base := strings.Join([]string{"/usr/bin", "/bin"}, sep())
+
+	tests := []struct {
+		name    string
+		raw     string
+		pattern string
+		want    bool
+	}{
+		{"matches one entry", base, "bin$", true},
+		{"substring match", base, "usr", true},
+		{"matches none", base, "^/opt", false},
+		{"empty path", "", "bin", false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			re := regexp.MustCompile(tt.pattern)
+			if got := domain.NewEnvPath(tt.raw).ContainsMatch(re); got != tt.want {
+				t.Errorf("ContainsMatch(%q) = %v, want %v", tt.pattern, got, tt.want)
 			}
 		})
 	}

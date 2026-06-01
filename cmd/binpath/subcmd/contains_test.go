@@ -66,3 +66,38 @@ func TestContainsCmd_requiresExactlyOneArg(t *testing.T) {
 		t.Fatal("contains with no args: expected error, got nil")
 	}
 }
+
+func TestContainsCmd_regex(t *testing.T) {
+	base := strings.Join([]string{"/usr/bin", "/bin"}, pathSep)
+
+	tests := []struct {
+		name    string
+		args    []string
+		absent  bool // true => expect ErrNotPresent (absent, exit 1)
+		wantErr bool // true => expect a genuine error (e.g. bad pattern, exit 2)
+	}{
+		{"matching pattern is present", []string{"--regex", "bin$"}, false, false},
+		{"non-matching pattern is absent", []string{"-r", "^/opt"}, true, false},
+		{"malformed pattern errors", []string{"-r", "["}, false, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Setenv("PATH", base)
+			_, err := execCmd(t, newContainsCmd(), tt.args...)
+			switch {
+			case tt.wantErr:
+				if err == nil || errors.Is(err, ErrNotPresent) {
+					t.Fatalf("contains %v: expected a genuine error, got %v", tt.args, err)
+				}
+			case tt.absent:
+				if !errors.Is(err, ErrNotPresent) {
+					t.Fatalf("contains %v: expected ErrNotPresent, got %v", tt.args, err)
+				}
+			default:
+				if err != nil {
+					t.Fatalf("contains %v: unexpected error: %v", tt.args, err)
+				}
+			}
+		})
+	}
+}
