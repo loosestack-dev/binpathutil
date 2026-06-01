@@ -1,13 +1,25 @@
 package main
 
 import (
+	"errors"
 	"os"
 
 	"binpathutil/cmd/binpath/subcmd"
 )
 
-func main() {
-	if err := subcmd.Execute(); err != nil {
-		os.Exit(1)
+// exit code mapping to have different result based on "the PATH does not countains what you asked for"
+// and "there was an acutal error".
+func exitCode(err error) int {
+	switch {
+	case err == nil:
+		return 0
+	case errors.Is(err, subcmd.ErrNotPresent):
+		return 1
+	default:
+		return 2
 	}
+}
+
+func main() {
+	os.Exit(exitCode(subcmd.Execute()))
 }
