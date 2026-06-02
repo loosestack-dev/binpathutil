@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"binpathutil/internal/path/domain"
+	"github.com/loosestack-dev/binpathutil/internal/path/domain"
 )
 
 func Contains(element string, getPathDependency func() (string, error)) (bool, error) {

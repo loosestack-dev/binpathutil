@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"binpathutil/internal/path"
-	"binpathutil/internal/path/usecases"
+	"github.com/loosestack-dev/binpathutil/internal/path"
+	"github.com/loosestack-dev/binpathutil/internal/path/usecases"
 )
 
 func newAddCmd() *cobra.Command {

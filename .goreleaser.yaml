@@ -1,0 +1,38 @@
+version: 2
+
+project_name: binpath
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - main: ./cmd/binpath
+    binary: binpath
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w -X github.com/loosestack-dev/binpathutil/cmd/binpath/subcmd.Version={{ .Version }}
+
+archives:
+  # No version names so the installer can use the stable
+  # /releases/latest/download/<asset> redirect, e.g. binpath_linux_amd64.tar.gz
+  - formats: [tar.gz] 
+    name_template: "binpath_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: checksums.txt
+
+release:
+  github:
+    owner: loosestack-dev
+    name: binpathutil
+
+changelog:
+  use: github

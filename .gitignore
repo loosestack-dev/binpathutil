@@ -1,1 +1,5 @@
+# Local build output
+/binpath
 
+# GoReleaser output
+/dist/

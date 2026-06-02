@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"binpathutil/internal/path/domain"
+	"github.com/loosestack-dev/binpathutil/internal/path/domain"
 )
 
 func RemoveIfPresent(element string, getPathDependency func() (string, error)) (string, error) {

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"binpathutil/cmd/binpath/subcmd"
+	"github.com/loosestack-dev/binpathutil/cmd/binpath/subcmd"
 )
 
 func TestExitCode(t *testing.T) {

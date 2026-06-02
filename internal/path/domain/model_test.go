@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"binpathutil/internal/path/domain"
+	"github.com/loosestack-dev/binpathutil/internal/path/domain"
 )
 
 func sep() string { return string(os.PathListSeparator) }

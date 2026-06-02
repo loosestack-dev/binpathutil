@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"binpathutil/internal/path/usecases"
+	"github.com/loosestack-dev/binpathutil/internal/path/usecases"
 )
 
 func TestPrepend(t *testing.T) {

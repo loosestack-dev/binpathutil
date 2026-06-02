@@ -3,7 +3,7 @@ package usecases
 import (
 	"fmt"
 
-	"binpathutil/internal/path/domain"
+	"github.com/loosestack-dev/binpathutil/internal/path/domain"
 )
 
 func prepend(element string, ignoreIfPresent bool, getPathDependency func() (string, error)) (string, error) {

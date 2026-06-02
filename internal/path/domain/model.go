@@ -38,7 +38,6 @@ func (p *EnvPath) Remove(entry string) error {
 	return nil
 }
 
-// RemoveMatch removes the first entry matching the expression; errors if none match.
 func (p *EnvPath) RemoveMatch(re *regexp.Regexp) error {
 	i := slices.IndexFunc(p.Entries, re.MatchString)
 	if i == -1 {

@@ -1,4 +1,4 @@
-module binpathutil
+module github.com/loosestack-dev/binpathutil
 
 go 1.26.3
 

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"os"
 
-	"binpathutil/cmd/binpath/subcmd"
+	"github.com/loosestack-dev/binpathutil/cmd/binpath/subcmd"
 )
 
 // exit code mapping to have different result based on "the PATH does not countains what you asked for"
